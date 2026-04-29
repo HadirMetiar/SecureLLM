@@ -1,0 +1,20 @@
+All employees must use strong passwords with at least 12 characters including uppercase lowercase numbers and symbols.
+Passwords must be changed every 90 days and cannot be reused for the last 5 previous passwords.
+Multi-factor authentication MFA is mandatory for all company accounts and all remote access connections.
+Employees must never share their credentials with anyone including IT support staff and managers.
+Phishing emails must be reported immediately to the security team at security@company.com without clicking any links.
+Unauthorized software installation on company devices is strictly prohibited and subject to disciplinary action.
+All company data must be stored exclusively on approved cloud platforms and never on personal devices.
+USB drives and external storage devices are strictly forbidden on all company computers and workstations.
+VPN must always be used when accessing company resources from outside the office network or from home.
+Data breaches must be reported to the IT security team within 1 hour of discovery without exception.
+Personal mobile devices used for work must be enrolled in the Mobile Device Management MDM system.
+Company laptops must be encrypted using BitLocker or FileVault and locked when unattended.
+Social engineering attacks like pretexting and baiting must be reported to the security team immediately.
+All sensitive emails containing personal or financial data must be encrypted before sending externally.
+Security awareness training is mandatory for all employees and must be completed within 30 days of hiring.
+Access to sensitive systems must follow the principle of least privilege and be reviewed every 6 months.
+Incident response procedures must be initiated within 15 minutes of detecting a potential security breach.
+All third-party vendors accessing company systems must sign a data processing agreement before access.
+Regular vulnerability assessments and penetration testing are conducted quarterly on all critical systems.
+Employees working remotely must ensure their home network uses WPA3 encryption and a strong password.

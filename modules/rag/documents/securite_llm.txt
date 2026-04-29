@@ -1,0 +1,7 @@
+La sécurité des grands modèles de langage (LLM) est un domaine critique.
+Les principales menaces incluent le prompt injection, la fuite de données sensibles et le data poisoning.
+Le prompt injection consiste à manipuler le modèle via des instructions malveillantes cachées dans la requête.
+La fuite de données sensibles se produit quand le LLM révèle des informations confidentielles.
+Le data poisoning consiste à injecter des données corrompues dans la base de connaissances.
+Pour sécuriser un LLM, il faut filtrer les requêtes entrantes, masquer les données PII et sécuriser la base vectorielle.
+Le projet SecureLLM propose une plateforme modulaire pour détecter et prévenir ces menaces.

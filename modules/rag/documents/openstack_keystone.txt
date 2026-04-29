@@ -1,0 +1,7 @@
+OpenStack est une plateforme cloud open-source qui permet de gérer des ressources informatiques virtualisées.
+Keystone est le service d authentification et d autorisation d OpenStack.
+Keystone gère les utilisateurs, les projets, les rôles et les tokens d accès.
+Snort est un système de détection d intrusion réseau open-source qui analyse le trafic en temps réel.
+La stack ELK (Elasticsearch, Logstash, Kibana) permet de collecter, traiter et visualiser les logs de sécurité.
+Elasticsearch stocke et indexe les données, Logstash les collecte et les transforme, Kibana les visualise.
+iptables est un outil Linux permettant de configurer les règles de filtrage du pare-feu réseau.

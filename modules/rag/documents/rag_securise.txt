@@ -1,0 +1,7 @@
+Le RAG (Retrieval-Augmented Generation) est une architecture qui enrichit un LLM avec une base de connaissances externe.
+La base vectorielle stocke des documents sous forme de vecteurs numériques appelés embeddings.
+FAISS est une bibliothèque développée par Meta pour effectuer des recherches de similarité rapides dans des vecteurs.
+Les embeddings sont générés par des modèles comme sentence-transformers/all-MiniLM-L6-v2.
+Pour sécuriser un RAG, il faut valider les documents avant indexation et vérifier leur intégrité au moment du retrieval.
+Le contrôle d accès RBAC permet de restreindre l accès aux documents selon le rôle de l utilisateur.
+Un hash SHA-256 est calculé pour chaque document afin de détecter toute modification après indexation.

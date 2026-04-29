@@ -1,0 +1,20 @@
+Les grands modèles de langage LLM sont vulnérables à plusieurs types d'attaques de sécurité critiques.
+Le prompt injection est une attaque où des instructions malveillantes manipulent le comportement du modèle.
+Le data poisoning consiste à injecter des données corrompues dans la base de connaissances du système.
+La fuite de données PII se produit quand le LLM divulgue des informations personnelles dans ses réponses.
+Le jailbreak est une technique pour contourner les restrictions de sécurité d'un modèle de langage.
+La sécurisation d'un LLM nécessite plusieurs couches de protection appliquées avant et après la génération.
+Le filtrage des requêtes entrantes est la première ligne de défense contre les attaques par injection.
+Le masquage des données PII protège les informations personnelles avant leur envoi au modèle de langage.
+RBAC Role Based Access Control permet de contrôler l'accès aux documents selon le rôle de l'utilisateur.
+FAISS est une bibliothèque de Meta pour la recherche efficace de similarité dans des espaces vectoriels.
+Les embeddings multilingues permettent de rechercher des documents dans plusieurs langues simultanément.
+La vérification d'intégrité par hash SHA-256 détecte toute modification non autorisée des documents.
+Le RAG Retrieval Augmented Generation améliore la précision des réponses en utilisant des documents locaux.
+LangChain est un framework Python pour orchestrer les différents composants d'un pipeline LLM sécurisé.
+Les modèles de langage ne doivent jamais recevoir de données sensibles non masquées comme les mots de passe.
+La normalisation du texte permet de détecter les tentatives d'injection utilisant le leetspeak ou les caractères spéciaux.
+Un classificateur ML entraîné sur des attaques réelles améliore significativement la détection des injections.
+La whitelist éducative permet de distinguer les questions légitimes sur la sécurité des vraies attaques.
+Le pipeline hybride RAG plus LLM général offre un équilibre entre précision documentaire et réponses générales.
+L'OWASP LLM Top 10 liste les 10 principales vulnérabilités de sécurité affectant les systèmes basés sur les LLM.

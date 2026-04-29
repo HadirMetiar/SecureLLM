@@ -1,0 +1,5 @@
+Large language models face several critical security threats.
+Prompt injection is an attack where malicious instructions manipulate the model.
+Data poisoning occurs when corrupted data is injected into the knowledge base.
+To secure an LLM, it is essential to filter requests, mask PII data, and secure the vector database.
+RBAC access control ensures only authorized users access specific documents.
