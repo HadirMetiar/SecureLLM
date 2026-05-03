@@ -58,6 +58,22 @@ stats = {
 }
 
 # ══════════════════════════════════════════════════════════
+# PHRASES QUI INDIQUENT QUE LE RAG N'A PAS TROUVÉ
+# ══════════════════════════════════════════════════════════
+PHRASES_ECHEC_RAG = [
+    "je ne trouve pas",
+    "je ne trouve pas cette information",
+    "aucune information",
+    "pas d'information",
+    "not found",
+    "i don't have",
+    "i cannot find",
+    "i can't find",
+    "no information",
+    "cannot be found",
+]
+
+# ══════════════════════════════════════════════════════════
 # MODÈLES PYDANTIC
 # ══════════════════════════════════════════════════════════
 class RequeteQuestion(BaseModel):
@@ -146,21 +162,33 @@ def ask(requete: RequeteQuestion):
     )
 
     # ── DÉCISION : RAG ou Fallback LLM ───────────────────
-    if not resultat_rag["bloque"]:
+    # Vérifie si le RAG a trouvé ET si la réponse est utile
+    reponse_rag_lower = resultat_rag["reponse"].lower()
+    rag_a_repondu = not resultat_rag["bloque"] and not any(
+        phrase in reponse_rag_lower
+        for phrase in PHRASES_ECHEC_RAG
+    )
+
+    if rag_a_repondu:
+        # ── CAS 1 : RAG a trouvé une vraie réponse ────────
         reponse_brute = resultat_rag["reponse"]
         sources       = resultat_rag["sources"]
         mode          = "rag_local"
         stats["reponses_rag"] += 1
+        logger.info(f"RAG | réponse trouvée | sources={sources}")
+
     else:
+        # ── CAS 2 : RAG vide ou réponse inutile → Fallback
         reponse_llm   = ask_llm(question_rag)
         reponse_brute = (
-            "⚠️ Aucun document autorisé trouvé dans la base locale pour votre rôle.\n"
+            "⚠️ Aucun document pertinent trouvé dans la base locale.\n"
             "Voici une réponse générale du LLM :\n\n"
             + reponse_llm
         )
         sources       = []
         mode          = "llm_general"
         stats["reponses_llm_general"] += 1
+        logger.info(f"FALLBACK LLM | RAG insuffisant")
 
     # ── Réponse finale ────────────────────────────────────
     reponse_finale = reponse_brute

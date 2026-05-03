@@ -82,11 +82,6 @@ def masquer_email_intelligent(email: str, lettre: str) -> str:
 # ── MASQUAGE PASSWORD INTELLIGENT ────────────────────────
 
 def masquer_password_intelligent(match, compteur: CompteurAlphabet) -> str:
-    """
-    Préserve le mot clé (password/mot de passe/etc.)
-    et masque uniquement la valeur du mot de passe.
-    password is Azerty@1234 → password is AAAAAAAAAAAA
-    """
     texte_complet = match.group(0)
     valeur_mdp    = match.group(1)
     lettre        = compteur.obtenir_lettre(valeur_mdp)
@@ -97,10 +92,6 @@ def masquer_password_intelligent(match, compteur: CompteurAlphabet) -> str:
 # ── MASQUAGE CVV INTELLIGENT ──────────────────────────────
 
 def masquer_cvv_intelligent(match, compteur: CompteurAlphabet) -> str:
-    """
-    Préserve le mot clé CVV/CVC et masque uniquement le code.
-    CVV 523 → CVV AAA
-    """
     texte_complet = match.group(0)
     valeur_cvv    = match.group(1)
     lettre        = compteur.obtenir_lettre(valeur_cvv)
@@ -111,10 +102,6 @@ def masquer_cvv_intelligent(match, compteur: CompteurAlphabet) -> str:
 # ── MASQUAGE PIN INTELLIGENT ──────────────────────────────
 
 def masquer_pin_intelligent(match, compteur: CompteurAlphabet) -> str:
-    """
-    Préserve le mot clé PIN et masque uniquement le code.
-    PIN 4521 → PIN AAAA
-    """
     texte_complet = match.group(0)
     valeur_pin    = match.group(1)
     lettre        = compteur.obtenir_lettre(valeur_pin)
@@ -125,10 +112,6 @@ def masquer_pin_intelligent(match, compteur: CompteurAlphabet) -> str:
 # ── MASQUAGE AUTH CODE INTELLIGENT ───────────────────────
 
 def masquer_auth_intelligent(match, compteur: CompteurAlphabet) -> str:
-    """
-    Préserve le mot clé authorization code et masque le code.
-    authorization code is 774521 → authorization code is AAAAAA
-    """
     texte_complet = match.group(0)
     valeur_auth   = match.group(1)
     lettre        = compteur.obtenir_lettre(valeur_auth)
@@ -210,42 +193,71 @@ def contient_titre_medical(texte_ent: str) -> bool:
     return False
 
 
+# ── RÈGLES DYNAMIQUES ANTI-FAUX-POSITIFS ─────────────────
+
+def est_faux_positif_gliner(texte_ent: str) -> bool:
+    """
+    Détecte dynamiquement si une entité est un faux positif.
+    Retourne True si l'entité NE DOIT PAS être masquée.
+    """
+    texte_nette = texte_ent.replace(" ", "").replace("-", "").replace(".", "")
+
+    # Règle 1 — Trop court (≤ 4 caractères)
+    if len(texte_nette) <= 4:
+        return True
+
+    # Règle 2 — Tout en majuscules et court (≤ 7 caractères)
+    if texte_ent.replace(" ", "").isupper() and len(texte_nette) <= 7:
+        return True
+
+    # Règle 3 — Contient des chiffres
+    if any(c.isdigit() for c in texte_ent):
+        return True
+
+    # Règle 4 — Commence par un chiffre
+    if texte_ent[0].isdigit():
+        return True
+    # ── RÈGLE 5 — NOUVELLE ────────────────────────────────
+    # Contient des mots fonctionnels (prépositions, articles)
+    # Un vrai nom propre ne contient pas "contre", "les", "de", "un"...
+    MOTS_FONCTIONNELS = {
+        "le", "la", "les", "un", "une", "des", "de", "du",
+        "et", "ou", "mais", "donc", "or", "ni", "car",
+        "contre", "avec", "sans", "pour", "sur", "sous",
+        "dans", "par", "the", "of", "and", "or", "in",
+        "an", "a", "to", "for", "with", "against", "on"
+    }
+    mots = texte_ent.lower().split()
+    if any(mot in MOTS_FONCTIONNELS for mot in mots):
+        return True
+    return False
+
+
 # ── COUCHE 1 — REGEX ──────────────────────────────────────
 
 PATTERNS = {
-    # Données structurées classiques
     "EMAIL":       r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b',
     "CREDIT_CARD": r'\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b',
     "PHONE":       r'\b(\+?[\d][\d\s\-\.]{6,}[\d])\b',
     "IBAN":        r'\b[A-Z]{2}\d{2}[A-Z0-9]{4,30}\b',
-
-    # Nouveaux patterns bancaires critiques
-    # Mot de passe — multilingue
     "PASSWORD": (
         r'(?i)(?:password|mot\s+de\s+passe|passwort|contraseña|senha|'
         r'mdp|pass|code\s+d\'accès|access\s+code)\s*(?:is|est|ist|es|é|:)?\s*(\S+)'
     ),
-
-    # CVV / CVC — code de sécurité carte
     "CVV": (
         r'(?i)\b(?:cvv|cvc|cvv2|cvc2|security\s+code|code\s+de\s+sécurité|'
         r'código\s+de\s+seguridad|sicherheitscode)\s*(?:is|est|ist|es|:)?\s*(\d{3,4})\b'
     ),
-
-    # PIN — code secret
     "PIN": (
         r'(?i)\b(?:pin|code\s+secret|código\s+pin|geheimzahl|'
         r'code\s+confidentiel|secret\s+code)\s*(?:is|est|ist|es|:)?\s*(\d{4,6})\b'
     ),
-
-    # Code d'autorisation
     "AUTH_CODE": (
         r'(?i)(?:authorization\s+code|auth\s+code|code\s+d\'autorisation|'
         r'código\s+de\s+autorización|autorisierungscode)\s*(?:is|est|ist|es|:)?\s*(\d{4,8})'
     ),
 }
 
-# Patterns avec groupe capturant la valeur à masquer
 PATTERNS_AVEC_GROUPE = {"PASSWORD", "CVV", "PIN", "AUTH_CODE"}
 
 def masquer_regex(texte: str, compteur: CompteurAlphabet) -> str:
@@ -297,7 +309,7 @@ GLINER_LABELS = [
     "organization name",
 ]
 
-SEUIL_GLINER = 0.4
+SEUIL_GLINER = 0.65
 
 def masquer_gliner(texte: str, compteur: CompteurAlphabet) -> str:
     try:
@@ -324,6 +336,10 @@ def masquer_gliner(texte: str, compteur: CompteurAlphabet) -> str:
         score     = ent["score"]
 
         if score < SEUIL_GLINER:
+            continue
+
+        if est_faux_positif_gliner(texte_ent):
+            print(f"  [SKIP] '{texte_ent}' = faux positif dynamique → ignoré")
             continue
 
         if est_personnage_public(texte_ent):
@@ -415,6 +431,13 @@ def masquer_presidio(texte: str, compteur: CompteurAlphabet) -> str:
     if not resultats:
         return texte
 
+    # ── DEBUG — voir exactement ce que Presidio détecte ──
+    print("\n[PRESIDIO DEBUG] Entités détectées :")
+    for res in resultats:
+        valeur = texte[res.start:res.end]
+        print(f"  → type='{res.entity_type}' | texte='{valeur}' | score={res.score:.2f}")
+    print()
+
     resultats_filtres = []
     for res in resultats:
         valeur = texte[res.start:res.end]
@@ -425,6 +448,9 @@ def masquer_presidio(texte: str, compteur: CompteurAlphabet) -> str:
 
         if res.entity_type == "PERSON":
             if est_personnage_public(valeur):
+                continue
+            if est_faux_positif_gliner(valeur):
+                print(f"  [PRESIDIO SKIP] '{valeur}' = faux positif → ignoré")
                 continue
 
         if res.entity_type == "LOCATION":
@@ -468,21 +494,13 @@ def masquer_pii(texte: str) -> dict:
         "texte_masque":   texte_en,
         "modifie":        texte_en != texte_traduit
     }
+
 def masquer_pii_pour_rag(texte: str) -> str:
     """
     Masquage PII sur le texte ORIGINAL sans traduction.
-    Utilisé pour envoyer au RAG dans la langue originale.
-    Applique : regex + GLiNER + Presidio directement sur l'original.
     """
     compteur = CompteurAlphabet()
-
-    # Étape 1 : Regex sur l'original
     texte = masquer_regex(texte, compteur)
-
-    # Étape 2 : GLiNER sur l'original (sans traduction)
     texte = masquer_gliner(texte, compteur)
-
-    # Étape 3 : Presidio sur l'original
     texte = masquer_presidio(texte, compteur)
-
     return texte
